@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Predict Heart Attack Risk</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Fade + Slide Animation */
+        .fade-slide {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeSlideIn 1s forwards;
+        }
+        .delay-200 { animation-delay: 0.2s; }
+
+        @keyframes fadeSlideIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glow Header */
+        .header-glow {
+            position: relative;
+            z-index: 10;
+        }
+        .header-glow::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 0.5rem;
+            background: linear-gradient(270deg, #ff4d4d, #ffb84d, #4da6ff, #4dff88);
+            background-size: 600% 600%;
+            filter: blur(50px);
+            opacity: 0.3;
+            z-index: -1;
+            animation: gradientPulse 8s ease infinite;
+        }
+        @keyframes gradientPulse {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen"
+      style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+             url('{{ url_for('static', filename='images/bg-heart-predict.jpg') }}') no-repeat center center fixed;
+             background-size: cover;">
+
+    {% include 'navbar.html' %}
+
+    <!-- Form Section -->
+    <main class="flex justify-center items-center py-12">
+        <div class="w-full max-w-3xl space-y-6">
+
+            <form method="POST" action="{{ url_for('predict') }}" class="fade-slide delay-200 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-2xl space-y-6">
+                <h2 class="text-3xl font-bold text-center text-gray-800">Enter Your Health Details</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Age -->
+                    <input type="number" step="any" name="age" placeholder="Age" required
+                           class="p-3 rounded-xl border focus:ring-2 focus:ring-red-500">
+
+                    <!-- Sex -->
+                    <select name="sex" required class="p-3 rounded-xl border focus:ring-2 focus:ring-red-500">
+                        <option value="">Select Gender</option>
+                        <option value="1">Male</option>
+                        <option value="0">Female</option>
+                    </select>
+
+                    <!-- Blood Oxygen -->
+                    <input type="number" step="any" name="blood_oxygen" placeholder="Blood Oxygen Level (SpO₂ %)" required
+                           class="p-3 rounded-xl border focus:ring-2 focus:ring-red-500">
+
+                    <!-- Heart Rate -->
+                    <input type="number" step="any" name="heart_rate" placeholder="Heart Rate (BPM)" required
+                           class="p-3 rounded-xl border focus:ring-2 focus:ring-red-500">
+
+                    <!-- Stress Level Slider -->
+                    <div class="flex flex-col">
+                        <label for="stress_level" class="font-semibold mb-1">Stress Level: <span id="stress_value">50</span></label>
+                        <input type="range" min="0" max="100" value="50" step="1"
+                               name="stress_level" id="stress_level"
+                               class="w-full h-2 bg-red-300 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <!-- Weight -->
+                    <input type="number" step="any" name="weight" placeholder="Weight (kg)" required
+                           class="p-3 rounded-xl border focus:ring-2 focus:ring-red-500">
+
+                    <!-- Height -->
+                    <input type="number" step="any" name="height" placeholder="Height (cm)" required
+                           class="p-3 rounded-xl border focus:ring-2 focus:ring-red-500">
+
+                    <!-- Smoking -->
+                    <select name="smoking" required class="p-3 rounded-xl border focus:ring-2 focus:ring-red-500">
+                        <option value="">Smoking Habit</option>
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+
+                    <!-- Drinking -->
+                    <select name="drinking" required class="p-3 rounded-xl border focus:ring-2 focus:ring-red-500">
+                        <option value="">Drinking Habit</option>
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition">
+                    Predict Risk
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // Update stress slider value dynamically
+        const slider = document.getElementById('stress_level');
+        const valueText = document.getElementById('stress_value');
+        slider.addEventListener('input', function() {
+            valueText.textContent = slider.value;
+        });
+
+        // Redirect after form submission
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            // Let Flask handle prediction, redirect to result page automatically
+        });
+    </script>
+
+</body>
+</html>

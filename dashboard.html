@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Heart Health Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .fade-slide { opacity: 0; transform: translateY(30px); animation: fadeSlideIn 1s forwards; }
+        .delay-200 { animation-delay: 0.2s; } 
+        .delay-400 { animation-delay: 0.4s; } 
+        .delay-600 { animation-delay: 0.6s; }
+        @keyframes fadeSlideIn { to { opacity:1; transform:translateY(0);} }
+        .card-glow { transition: all 0.3s ease-in-out; }
+        .card-glow:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 0 25px rgba(255,255,255,0.3), 0 10px 25px rgba(0,0,0,0.5); }
+        .header-glow { position: relative; z-index: 10; }
+        .header-glow::before {
+            content:""; position:absolute; inset:0; border-radius:0.5rem;
+            background: linear-gradient(270deg, #ff4d4d, #ffb84d, #4da6ff, #4dff88);
+            background-size:600% 600%; filter: blur(50px); opacity:0.3; z-index:-1;
+            animation: gradientPulse 8s ease infinite;
+        }
+        @keyframes gradientPulse { 0% {background-position:0% 50%;} 50% {background-position:100% 50%;} 100% {background-position:0% 50%;} }
+    </style>
+</head>
+<body class="min-h-screen"
+      style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+             url('{{ url_for('static', filename='images/bg-heart-dashboard.jpg') }}') no-repeat center center fixed;
+             background-size: cover;">
+
+    {% include 'navbar.html' %}
+
+    <header class="header-glow bg-black/70 p-8 shadow-2xl w-full sticky top-0 z-50 fade-slide">
+        <h1 class="text-6xl font-extrabold text-white drop-shadow-2xl text-center uppercase">❤️ Heart Health Dashboard</h1>
+    </header>
+
+    <main class="flex flex-col items-center gap-10 px-6 py-12">
+
+        {% if session.get('last_prediction') %}
+        <div class="fade-slide delay-200 w-full max-w-3xl text-center p-6 rounded-2xl shadow-2xl backdrop-blur-md bg-white/80
+            {% if session['last_prediction'] == 'low_risk' %}border-l-8 border-green-600
+            {% elif session['last_prediction'] == 'medium_risk' %}border-l-8 border-yellow-500
+            {% else %}border-l-8 border-red-600{% endif %}">
+
+            <h2 class="text-3xl font-extrabold">
+                Your Last Prediction: 
+                <span class="{% if session['last_prediction'] == 'low_risk' %}text-green-700
+                                {% elif session['last_prediction'] == 'medium_risk' %}text-yellow-700
+                                {% else %}text-red-700{% endif %}">
+                    {{ session['last_prediction'].replace('_',' ').title() }}
+                </span>
+            </h2>
+            <p class="text-gray-700 mt-3 text-lg">Personalized advice is available for this risk level.</p>
+
+            <div class="mt-4 flex justify-center gap-4">
+                <a href="{{ url_for('export_csv') }}" class="px-6 py-3 rounded-xl bg-green-600 text-white font-bold hover:bg-green-700 transition">
+                   Export CSV
+                </a>
+                <button id="exportPDFBtn" class="px-6 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition">
+                   Export PDF
+                </button>
+            </div>
+
+            <!-- Updated Buttons: Precautions, Medicines, History -->
+            <div class="mt-4 flex justify-center gap-4">
+                <a href="{{ url_for('precautions_level', risk_level=session['last_prediction']) }}" class="px-6 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition">View Precautions</a>
+                <a href="{{ url_for('medicines') }}" class="px-6 py-3 rounded-xl bg-green-600 text-white font-bold hover:bg-green-700 transition">View Medicines</a>
+                <a href="{{ url_for('history') }}" class="px-6 py-3 rounded-xl bg-yellow-500 text-white font-bold hover:bg-yellow-600 transition">View History</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl fade-slide delay-400">
+            <a href="{{ url_for('predict') }}" class="card-glow text-center p-8 rounded-2xl backdrop-blur-md bg-gradient-to-br from-red-600 to-red-800 shadow-2xl text-white">
+                <h3 class="text-3xl font-bold mb-4">🩺 Predict Risk</h3>
+                <p class="text-lg">Enter your health details and check your heart attack risk.</p>
+            </a>
+            <a href="{{ url_for('precautions_default') }}" class="card-glow text-center p-8 rounded-2xl backdrop-blur-md bg-gradient-to-br from-yellow-500 to-yellow-700 shadow-2xl text-white">
+                <h3 class="text-3xl font-bold mb-4">🛡 Precautions</h3>
+                <p class="text-lg">See lifestyle recommendations for every risk level.</p>
+            </a>
+            <a href="{{ url_for('medicines') }}" class="card-glow text-center p-8 rounded-2xl backdrop-blur-md bg-gradient-to-br from-blue-600 to-blue-800 shadow-2xl text-white">
+                <h3 class="text-3xl font-bold mb-4">💊 Medicines</h3>
+                <p class="text-lg">Browse common medications recommended for heart health.</p>
+            </a>
+        </div>
+
+        <div class="fade-slide delay-600 w-full max-w-4xl p-6 rounded-2xl shadow-2xl backdrop-blur-md bg-white/80">
+            <h2 class="text-3xl font-bold text-center mb-4">📈 Prediction History</h2>
+            <canvas id="historyChart"></canvas>
+        </div>
+    </main>
+
+    <footer class="bg-black/70 text-white text-center p-4 mt-8">
+        &copy; {{ username }} | Heart Health Dashboard
+    </footer>
+
+    <script>
+        const ctx = document.getElementById('historyChart').getContext('2d');
+        const pointColors = [
+            {% for record in history %}
+                {% if record.probability < 33 %} 'green',
+                {% elif record.probability < 66 %} 'yellow',
+                {% else %} 'red',
+                {% endif %}
+            {% endfor %}
+        ];
+        const historyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [{% for record in history %}'{{ record.timestamp }}',{% endfor %}],
+                datasets: [{
+                    label: 'Risk Probability (%)',
+                    data: [{% for record in history %}{{ record.probability }},{% endfor %}],
+                    borderColor: 'rgba(255,99,132,1)',
+                    backgroundColor: 'rgba(255,99,132,0.2)',
+                    tension: 0.3,
+                    fill: true,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: pointColors
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true, max: 100 }, x: { ticks: { autoSkip: true, maxTicksLimit: 10 } } },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        document.getElementById('exportPDFBtn').addEventListener('click', function() {
+            const chartCanvas = document.getElementById('historyChart');
+            const chartImage = chartCanvas.toDataURL('image/png');
+
+            fetch("{{ url_for('export_pdf') }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chart_image: chartImage })
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "heart_history.pdf";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Medicines</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen"
+      style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+             url('{{ url_for('static', filename='images/bg-heart-medicines.jpg') }}') no-repeat center center fixed;
+             background-size: cover;">
+             
+    {% include 'navbar.html' %}
+
+    <header class="bg-black/70 p-6 text-center border-b-4 border-red-600 shadow-2xl">
+        <h1 class="text-5xl font-extrabold text-white drop-shadow-xl uppercase">
+            💊 Heart Health Medicines
+        </h1>
+    </header>
+
+    <main class="flex justify-center items-center py-12">
+        <div class="bg-white/85 backdrop-blur-lg p-8 rounded-2xl shadow-2xl w-full max-w-4xl space-y-6">
+            <h2 class="text-3xl font-bold text-gray-800 text-center">
+                Recommended Medicines for <span class="text-red-600">{{ risk_level.replace('_',' ').title() }}</span> Risk
+            </h2>
+
+            <table class="table-auto w-full text-left border border-gray-300 rounded-xl shadow-lg">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-3 border-b">Medicine</th>
+                        <th class="px-4 py-3 border-b">Purpose</th>
+                        <th class="px-4 py-3 border-b">Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for med in medicines %}
+                    <tr class="hover:bg-gray-100">
+                        <td class="px-4 py-3 border-b">{{ med.name }}</td>
+                        <td class="px-4 py-3 border-b">{{ med.purpose }}</td>
+                        <td class="px-4 py-3 border-b">{{ med.notes }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="text-center mt-6">
+                <a href="{{ url_for('dashboard') }}" 
+                   class="px-6 py-3 bg-gray-800 text-white rounded-xl shadow hover:bg-gray-900 font-bold">
+                    🔙 Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

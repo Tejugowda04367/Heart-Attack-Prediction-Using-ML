@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Background with overlay */
+        body.login-bg {
+            background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('{{ url_for('static', filename='images/bg-heart-login.jpg') }}');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* Form container with animated glow */
+        .form-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .form-glow {
+            position: relative;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            transition: all 0.3s ease-in-out;
+            animation: floatForm 6s ease-in-out infinite;
+            z-index: 10;
+            border-radius: 1.5rem;
+        }
+
+        .form-glow::before {
+            content: "";
+            position: absolute;
+            top: -20px; left: -20px; right: -20px; bottom: -20px;
+            background: linear-gradient(270deg, #ff4d4d, #ffb84d, #4da6ff, #4dff88);
+            background-size: 600% 600%;
+            filter: blur(40px);
+            opacity: 0.3;
+            z-index: -1;
+            border-radius: 1.5rem;
+            animation: gradientPulse 8s ease infinite;
+        }
+
+        @keyframes gradientPulse {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating animation */
+        @keyframes floatForm {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Heading glow and hover */
+        .heading-glow {
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+            transition: all 0.3s ease-in-out;
+        }
+        .heading-glow:hover {
+            text-shadow: 0 0 25px rgba(255, 50, 50, 0.9);
+            transform: scale(1.05);
+        }
+
+        /* Button glow and hover */
+        .btn-glow {
+            transition: all 0.3s ease-in-out;
+        }
+        .btn-glow:hover {
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.8);
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        /* Links hover animation */
+        .link-hover {
+            transition: all 0.3s ease-in-out;
+        }
+        .link-hover:hover {
+            text-shadow: 0 0 10px rgba(255, 200, 200, 0.8);
+            transform: scale(1.05);
+        }
+
+        /* Input field glow on focus and hover */
+        input {
+            transition: all 0.3s ease-in-out;
+        }
+        input:focus, input:hover {
+            box-shadow: 0 0 10px rgba(255, 99, 71, 0.8);
+            border-color: #ff6347; /* tomato/red glow */
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="login-bg flex items-center justify-center min-h-screen">
+
+    <div class="form-container">
+        <form method="post" class="form-glow p-10 w-full max-w-md space-y-6">
+            <h1 class="text-5xl font-extrabold text-red-600 text-center mb-4 heading-glow">Login</h1>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <p class="text-{{ 'red-600' if category=='danger' else 'green-600' }} font-semibold link-hover">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <input type="text" name="username" placeholder="Username" required class="w-full p-3 border rounded-lg text-xl">
+            <input type="password" name="password" placeholder="Password" required class="w-full p-3 border rounded-lg text-xl">
+            
+            <button type="submit" class="w-full bg-red-600 text-white py-3 rounded-lg text-2xl font-extrabold btn-glow drop-shadow-md">Login</button>
+
+            <p class="text-center text-white text-lg">New user? 
+                <a href="{{ url_for('signup') }}" class="text-red-400 hover:text-red-600 font-semibold link-hover">Signup</a>
+            </p>
+        </form>
+    </div>
+
+</body>
+</html>

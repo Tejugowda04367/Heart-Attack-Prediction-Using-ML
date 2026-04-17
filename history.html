@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prediction History</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Fade + Slide Animation */
+        .fade-slide {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeSlideIn 1s forwards;
+        }
+        .delay-200 { animation-delay: 0.2s; }
+
+        @keyframes fadeSlideIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glow Header */
+        .header-glow {
+            position: relative;
+            z-index: 10;
+        }
+        .header-glow::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 0.5rem;
+            background: linear-gradient(270deg, #ff4d4d, #ffb84d, #4da6ff, #4dff88);
+            background-size: 600% 600%;
+            filter: blur(50px);
+            opacity: 0.3;
+            z-index: -1;
+            animation: gradientPulse 8s ease infinite;
+        }
+        @keyframes gradientPulse {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen"
+      style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+             url('{{ url_for('static', filename='images/bg-heart-history.jpg') }}') no-repeat center center fixed;
+             background-size: cover;">
+
+{% include 'navbar.html' %}
+
+<!-- Header -->
+<header class="header-glow bg-black/70 p-6 text-center border-b-4 border-red-600 shadow-2xl">
+    <h1 class="text-5xl font-extrabold text-white drop-shadow-2xl uppercase">📜 Prediction History</h1>
+</header>
+
+<!-- History Table -->
+<main class="flex justify-center py-12">
+    <div class="fade-slide delay-200 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-5xl space-y-6">
+        <h2 class="text-3xl font-bold text-center text-gray-800">All Your Predictions</h2>
+
+        {% if history %}
+        <table class="table-auto w-full text-left border border-gray-300 rounded-xl shadow-lg">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-4 py-3 border-b">Timestamp</th>
+                    <th class="px-4 py-3 border-b">Prediction</th>
+                    <th class="px-4 py-3 border-b">Probability (%)</th>
+                    <th class="px-4 py-3 border-b">Risk Level</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pred in history %}
+                <tr class="{% if 'Low' in pred[2] %}bg-green-50{% elif 'Medium' in pred[2] %}bg-yellow-50{% else %}bg-red-50{% endif %}">
+                    <td class="px-4 py-3 border-b">{{ pred[3] }}</td>
+                    <td class="px-4 py-3 border-b font-bold">{{ pred[0] }}</td>
+                    <td class="px-4 py-3 border-b">{{ pred[1] }}</td>
+                    <td class="px-4 py-3 border-b">
+                        <span class="px-2 py-1 {% if 'Low' in pred[2] %}bg-green-600{% elif 'Medium' in pred[2] %}bg-yellow-500{% else %}bg-red-600{% endif %} text-white rounded-full text-sm">
+                            {{ pred[2] }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-center text-gray-700 text-lg">No prediction history found.</p>
+        {% endif %}
+
+        <div class="text-center mt-6">
+            <a href="{{ url_for('dashboard') }}"
+               class="px-6 py-3 bg-gradient-to-r from-green-700 to-green-500 text-white font-bold rounded-xl shadow-xl hover:from-green-600 hover:to-green-400 transform hover:scale-105 transition-all">
+               🏠 Back to Dashboard
+            </a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

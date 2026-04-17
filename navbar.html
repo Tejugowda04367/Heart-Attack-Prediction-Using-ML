@@ -1,0 +1,31 @@
+<!-- navbar.html -->
+<nav class="bg-black/70 text-white flex justify-between items-center px-6 py-4 shadow-lg sticky top-0 z-50">
+    <!-- Logo / Brand -->
+    <div class="text-2xl font-bold tracking-wide">
+        ❤️ Heart Health
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="space-x-6 flex items-center">
+        <a href="{{ url_for('dashboard') }}" 
+           class="hover:text-red-400 font-bold transition-colors duration-300">Dashboard</a>
+
+        <a href="{{ url_for('predict') }}" 
+           class="hover:text-red-400 font-bold transition-colors duration-300">Predict Risk</a>
+
+        <a href="{{ url_for('precautions_default') }}" 
+           class="hover:text-red-400 font-bold transition-colors duration-300">Precautions</a>
+
+        <a href="{{ url_for('medicines') }}" 
+           class="hover:text-red-400 font-bold transition-colors duration-300">Medicines</a>
+
+        <a href="{{ url_for('history') }}" 
+           class="hover:text-red-400 font-bold transition-colors duration-300">History</a>
+
+        <!-- Logout Button -->
+        <a href="{{ url_for('logout') }}" 
+           class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 font-bold transition-colors duration-300">
+            Logout
+        </a>
+    </div>
+</nav>

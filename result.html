@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prediction Result</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Fade + Slide Animation */
+        .fade-slide {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeSlideIn 1s forwards;
+        }
+        .delay-200 { animation-delay: 0.2s; }
+
+        @keyframes fadeSlideIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glow Header */
+        .header-glow {
+            position: relative;
+            z-index: 10;
+        }
+        .header-glow::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 0.5rem;
+            background: linear-gradient(270deg, #ff4d4d, #ffb84d, #4da6ff, #4dff88);
+            background-size: 600% 600%;
+            filter: blur(50px);
+            opacity: 0.3;
+            z-index: -1;
+            animation: gradientPulse 8s ease infinite;
+        }
+        @keyframes gradientPulse {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Risk Text Styles */
+        .glow-green {
+            color: #166534;
+            text-shadow: 0 0 15px rgba(22, 101, 52, 0.8);
+            animation: pulseGreen 1.5s infinite alternate;
+        }
+        .glow-yellow {
+            color: #854d0e;
+            text-shadow: 0 0 15px rgba(202, 138, 4, 0.8);
+            animation: pulseYellow 1.5s infinite alternate;
+        }
+        .glow-red {
+            color: #991b1b;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.9);
+            animation: shake 0.6s infinite;
+        }
+
+        @keyframes pulseGreen {
+            from { transform: scale(1); opacity: 0.9; }
+            to { transform: scale(1.05); opacity: 1; }
+        }
+        @keyframes pulseYellow {
+            from { transform: scale(1); opacity: 0.85; }
+            to { transform: scale(1.08); opacity: 1; }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            50% { transform: translateX(2px); }
+            75% { transform: translateX(-1px); }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen"
+      style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+             url('{{ url_for('static', filename='images/bg-heart-result.jpg') }}')
+             no-repeat center center fixed;
+             background-size: cover;">
+
+    {% include 'navbar.html' %}
+
+    <!-- Result Section -->
+    <main class="flex justify-center items-center py-12">
+        <div class="fade-slide delay-200 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-3xl text-center space-y-6">
+            <h2 class="text-3xl font-bold text-gray-800">Your Heart Risk</h2>
+
+            <!-- Prediction Box -->
+            <div class="p-6 rounded-xl text-3xl font-extrabold
+                        {% if 'Low' in prediction %}bg-green-200 glow-green
+                        {% elif 'Medium' in prediction %}bg-yellow-200 glow-yellow
+                        {% else %}bg-red-200 glow-red{% endif %}">
+                {{ prediction }}<br>
+                <span class="text-xl">Probability: {{ probability }}%</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 mt-4">
+                <!-- Predict Again -->
+                <a href="{{ url_for('predict') }}"
+                   class="px-6 py-3 bg-gradient-to-r from-red-700 to-red-600 text-white font-bold rounded-xl shadow-xl hover:from-red-600 hover:to-red-500 transform hover:scale-105 transition-all">
+                    🔄 Predict Again
+                </a>
+
+                <!-- Precautions -->
+                <a href="{{ url_for('precautions_level', risk_level=prediction.lower().replace(' ', '_')) }}"
+                   class="px-6 py-3 
+                        {% if 'Low' in prediction %}bg-green-600 hover:bg-green-500{% elif 'Medium' in prediction %}bg-yellow-600 hover:bg-yellow-500{% else %}bg-red-600 hover:bg-red-500{% endif %}
+                        text-white font-bold rounded-xl shadow-xl transform hover:scale-105 transition-all">
+                    💡 Precautions
+                </a>
+
+                <!-- Medicines -->
+                <a href="{{ url_for('medicines') }}"
+                   class="px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-500 text-white font-bold rounded-xl shadow-xl hover:from-blue-600 hover:to-blue-400 transform hover:scale-105 transition-all">
+                    💊 Recommended Medicines
+                </a>
+
+                <!-- Dashboard -->
+                <a href="{{ url_for('dashboard') }}"
+                   class="px-6 py-3 bg-gradient-to-r from-green-700 to-green-500 text-white font-bold rounded-xl shadow-xl hover:from-green-600 hover:to-green-400 transform hover:scale-105 transition-all">
+                    🏠 Dashboard
+                </a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

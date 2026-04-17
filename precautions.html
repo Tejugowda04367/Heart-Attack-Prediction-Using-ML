@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Heart Health Precautions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Fade + Slide Animation */
+        .fade-slide {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeSlideIn 1s forwards;
+        }
+        .delay-200 { animation-delay: 0.2s; }
+
+        @keyframes fadeSlideIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glow Header */
+        .header-glow {
+            position: relative;
+            z-index: 10;
+        }
+        .header-glow::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 0.5rem;
+            background: linear-gradient(270deg, #ff4d4d, #ffb84d, #4da6ff, #4dff88);
+            background-size: 600% 600%;
+            filter: blur(50px);
+            opacity: 0.3;
+            z-index: -1;
+            animation: gradientPulse 8s ease infinite;
+        }
+        @keyframes gradientPulse {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="min-h-screen"
+      style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+             url('{{ url_for('static', filename='images/bg-heart-precautions.jpg') }}') no-repeat center center fixed;
+             background-size: cover;">
+
+    <!-- Header -->
+    <header class="header-glow bg-black/70 p-6 shadow-2xl text-center border-b-4 border-red-600">
+        <h1 class="text-5xl font-extrabold text-white drop-shadow-2xl uppercase">💡 Heart Precautions</h1>
+    </header>
+
+    <!-- Precautions Section -->
+    <main class="flex justify-center py-12">
+        <div class="fade-slide delay-200 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-3xl space-y-6">
+            <h2 class="text-3xl font-bold text-center text-gray-800">
+                Precautions for <span class="text-red-600">{{ risk_level.replace('_', ' ').title() }}</span>
+            </h2>
+
+            <ul class="list-disc list-inside text-gray-700 space-y-3 text-lg">
+                {% for item in precautions %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+
+            <div class="text-center mt-6">
+                <a href="{{ url_for('dashboard') }}"
+                   class="inline-block px-6 py-3 bg-gradient-to-r from-red-700 to-red-600 text-white font-bold rounded-xl shadow-xl hover:from-red-600 hover:to-red-500 transform hover:scale-105 transition-all">
+                    🏠 Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
